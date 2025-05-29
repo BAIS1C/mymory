@@ -119,15 +119,6 @@ st.text_area("Edit Mymory")
 
 ---
 
-## 💸 Cost Breakdown
-
-| Component                | Cost Estimate | Notes                        |
-| ------------------------ | ------------- | ---------------------------- |
-| LoRA Training (per unit) | \$20–\$50     | Per adapter                  |
-| Validator Review (human) | \$10/hr       | 5–10 min per Mymory          |
-| Hosting + Storage        | \~\$300/month | SQLite, Streamlit, LLM usage |
-
----
 
 ## 🚀 Call to Action
 
@@ -138,15 +129,6 @@ st.text_area("Edit Mymory")
 
 ---
 
-## 📎 Appendices
-
-* Full JSON schema for KCG and Mymories
-* Tiered Validator Loop breakdown
-* LoRA Merge Governance
-* Architecture & Lifecycle Diagrams
-* Streamlit & n8n MVP blueprint
-
----
 
 ## 🔗 References
 
