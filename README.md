@@ -1,139 +1,357 @@
-# Mymory
+🧠 Mymory: A Semantic Alignment Layer for Persistent, Governed AI Cognition
+Abstract
 
-## A Recursive AI Framework for Self-Reflective Learning and Validator-Governed Adaptation
+Modern LLMs are powerful but fundamentally stateless. Each interaction begins from near-zero context, leading to behavioural drift, identity inconsistency, and loss of long-term intent. Existing “memory” approaches focus on raw retrieval or fine-tuning, both of which introduce new problems: noise accumulation, hidden bias drift, lack of auditability, and loss of user agency.
 
----
+Mymory is a Semantic Alignment Layer that sits between user interaction and model inference. It governs what an AI remembers, why it remembers it, and under whose authority that memory persists.
 
-## 🧬 Abstract
+Rather than continuous retraining or unfiltered retrieval, Mymory uses:
 
-**Mymory** is a recursive AI architecture that combines long-term memory (Mymories), modular reasoning, LoRA-based personalization, and a human-in-the-loop validation framework. Designed for autonomy, auditability, and adaptation, it enables AI agents to evolve over time through a structured self-reflection and improvement process. Each learning is validated through a tiered loop and optionally published on-chain via Merkle trees or dNFT anchors for trust and governance.
+a Directed Acyclic Graph (DAG) of contextual memories,
 
----
+a dual-LLM architecture (primary agent + curator),
 
-## 🧠 System Overview
+human-in-the-loop governance,
 
-![System Architecture Diagram](System_Architecture_Diagram.png)
+and portable, auditable memory snapshots.
 
-### 🔧 Key Modules
+The result is AI behaviour that remains coherent, identity-consistent, and aligned over long time horizons without requiring model fine-tuning.
 
-* **Reflection Engine** – Introspective loop generating insights and learnings ("Mymories")
-* **Validator Loop** – Tiered validation from LLMs to human auditors
-* **Mymory Ledger** – Merkle-tree based local or decentralized memory store
-* **LoRA Integration** – Spawned, validated, and merged adapters
-* **Governance Layer** – Optional DAO or committee oversight
-* **Provenance Anchoring** – Optional dNFTs to ensure trust and economic signaling
+1. Problem Statement
+1.1 The Drift Problem
 
----
+LLMs drift because:
 
-## 📚 Core Concepts
+context windows are finite,
 
-### ✅ Mymories
+retrieval systems grow unbounded,
 
-Structured memory units storing lessons, validations, metadata, and lineage.
+relevance criteria shift implicitly,
 
-```json
+and training updates are opaque.
+
+Over time, agents:
+
+contradict earlier positions,
+
+lose personality coherence,
+
+overfit to recent interactions,
+
+or accumulate semantic noise.
+
+1.2 Why RAG Alone Is Insufficient
+
+Naïve RAG systems:
+
+retrieve by similarity, not intent,
+
+lack memory decay or prioritisation,
+
+cannot explain why something was recalled,
+
+provide no user governance.
+
+This leads to retrieval drift, which is just drift in a different form.
+
+2. Design Philosophy
+
+Mymory is built on five principles:
+
+Memory is curated, not accumulated
+
+Alignment precedes retrieval
+
+Humans remain sovereign over long-term memory
+
+Memory must be auditable and portable
+
+Training is optional, not foundational
+
+3. High-Level Architecture
+User Interaction
+      ↓
+Primary LLM (Agent)
+      ↓
+Candidate Memory Events
+      ↓
+Semantic Curator LLM
+      ↓
+Human-in-the-loop Review (optional / periodic)
+      ↓
+DAG-based Memory Graph
+      ↓
+Curated RAG Injection
+      ↓
+Stable, Identity-Consistent Responses
+
+
+No sleep cycles.
+No mandatory fine-tuning.
+No silent memory growth.
+
+4. Core Components
+4.1 Primary Agent LLM
+
+The main conversational or task-oriented model.
+
+Responsibilities:
+
+generate responses,
+
+flag potential memory-worthy moments,
+
+request context when needed.
+
+It does not decide what becomes long-term memory.
+
+4.2 Semantic Curator LLM (Management Agent)
+
+A secondary, smaller or cheaper model responsible for memory governance.
+
+Its role is not to generate output, but to reason about memory.
+
+It evaluates candidate memories against:
+
+relevance to long-term goals,
+
+identity consistency,
+
+redundancy,
+
+temporal importance,
+
+alignment with prior validated memory.
+
+The curator operates under a stable, constrained system prompt, acting as a constitutional anchor to prevent its own drift.
+
+4.3 Human-in-the-Loop Governance
+
+Humans remain in control of what persists.
+
+Governance can be:
+
+real-time prompts (“Should I remember this?”),
+
+periodic review sessions,
+
+threshold-triggered audits.
+
+Humans can:
+
+approve,
+
+edit,
+
+downgrade,
+
+merge,
+
+or delete memories.
+
+This applies not just to factual memory, but values, preferences, and identity traits.
+
+5. Memory Representation: The DAG
+5.1 Why a DAG?
+
+Memory is not linear.
+
+A Directed Acyclic Graph allows:
+
+multiple lineage paths,
+
+branching interpretations,
+
+decay without deletion,
+
+explicit provenance.
+
+Each node represents a Mymory object.
+
+5.2 Mymory Node Schema
 {
-  "id": "mymory_20250528_001",
-  "content": "Reflected that KCG nodes should use decay logic.",
-  "timestamp": "2025-05-28T12:45:00Z",
+  "id": "mymory_2025_07_14_001",
+  "content": "User prefers strategic over tactical explanations.",
+  "timestamp": "2025-07-14T22:45:00Z",
+  "confidence": 0.82,
+  "decay_rate": 0.03,
+  "parents": ["mymory_2025_06_01_004"],
   "status": "approved",
-  "hash": "abc123...",
-  "previous_hash": "xyz789..."
+  "governance": {
+    "validated_by": ["curator_llm", "human"],
+    "notes": "Consistent across multiple sessions"
+  }
 }
-```
 
-### ✅ Validator Loop
+5.3 Time-Based Hierarchy
 
-Three tiers:
+Recent nodes have higher activation weight.
 
-* **Tier 0**: Fast automated schema checks, hallucination/bias screening
-* **Tier 1**: LLM agent validation (factuality, contradiction, ethical review)
-* **Tier 2**: Human validator audit interface
+Older nodes decay unless reinforced.
 
-Includes escalation, dispute resolution, and audit logging.
+Reinforcement requires semantic justification, not repetition.
 
-### ✅ LoRA Lifecycle
+This prevents “recency dominance” and “nostalgia lock-in”.
 
-* Per-insight LoRA adapters are created post-validation
-* Stored in registry and optionally merged into runtime
-* Sleep/Dream cycles control when merges happen
+6. From DAG to RAG (Controlled Retrieval)
+6.1 Selective Context Assembly
 
-### ✅ Recursive Improvement Loop
+When context is needed:
 
-1. User interaction
-2. Reflection generates Mymory
-3. Mymory enters Validator Loop
-4. LoRA adapter is trained
-5. Adapter is merged or queued for dream phase
+Query intent is embedded.
 
----
+Candidate nodes are selected from the DAG.
 
-## 🔁 Implementation Plan (MVP)
+Curator LLM filters by:
 
-* Workflow orchestrated in `n8n.io`
-* Mymories stored in SQLite with optional Avalanche expansion
-* LoRA adapters trained using DeepSeek/Mistral stack
-* Validator Loop: GPT-4o → Claude 3 → Human UI (Streamlit)
-* Weekly runtime:
+identity consistency,
 
-  * Friday: Sleep cycle & collation
-  * Saturday: Human approval phase
-  * Sunday night: LoRA training
+behavioural relevance,
 
----
+conflict risk.
 
-## 🧪 Sample Artifacts
+Only the minimal coherent subset is injected.
 
-### 🧠 Mymory Lifecycle Diagram
+6.2 Drift Prevention Mechanisms
 
-![Mymory Lifecycle](Mymory_Lifecycle_Diagram.png)
+Conflicting nodes are flagged, not merged.
 
-### 🧾 Validator Prompt (Tier 1)
+Retrieval requires curator approval.
 
-```json
-{
-  "factually_accurate": false,
-  "confidence": 0.95,
-  "explanation": "Capital of Australia is Canberra, not Sydney."
-}
-```
+High-impact memories require human sign-off.
 
-### 🧑‍💻 Streamlit Snippet (Human UI)
+This makes drift visible and correctable, not silent.
 
-```python
-st.header("Human Validation")
-st.write(my_memory_content)
-st.write(tier1_results)
-st.write(lineage)
-st.text_area("Edit Mymory")
-```
+7. Portable Memory Snapshots (.mmr)
+7.1 Purpose
 
----
+.mmr files are human-readable, auditable exports of a curated memory state.
 
-## 🛡️ Ethics & Governance
+They enable:
 
-* Tiered Validator Loop enforces safety
-* Optional NIST-compliant flow
-* Audit trails logged per validation
-* Optional decentralized governance board or DAO
+cross-model continuity,
 
----
+agent migration,
+
+cold-start recovery,
+
+regulatory inspection.
+
+7.2 .mmr Structure
+@SESSION strands.agent.kasai
+$TIME 2025-07-14T22:45Z
+
+>KEY_INSIGHTS
+- User prioritises long-term system design over short-term hacks
+- Alignment stability valued over novelty
+
+>STATE_OBJECTS
+Kasai.identity=strategic
+TrustVector=stable
+MemoryDecay=active
+
+>OPEN_LOOPS
+- Formalise governance UI
+- Test curator prompt robustness
 
 
-## 🚀 Call to Action
+.mmr files are derived artifacts, not raw logs.
 
-* 🔗 Fork us on GitHub
-* ⭐ Star the repo if you believe in recursive learning
-* 🧙‍♂️ Join the Validator Guild
-* 🧠 Spread the signal, not the noise
+8. Blockchain & Provenance (Optional, Modular)
 
----
+Mymory is chain-agnostic.
 
+Possible anchoring strategies:
 
-## 🔗 References
+Merkle roots of DAG states,
 
-* Reflexion (Shinn et al., 2023)
-* LangGraph (Hugging Face)
-* LoRA: Low-Rank Adaptation of LLMs (Hu et al., 2022)
-* NIST AI Risk Management Framework
-* Constitutional AI (Anthropic, 2023)
+pNFTs representing approved memory snapshots,
+
+timestamped hashes for audit trails.
+
+Blockchains do not store memory content, only proofs.
+
+This preserves privacy while enabling:
+
+provenance,
+
+portability,
+
+governance signalling.
+
+9. What Governs the Governor?
+
+The curator LLM is constrained by:
+
+A fixed constitutional prompt
+
+A limited action space (recommend, not write)
+
+Human override
+
+Auditability of every decision
+
+If the curator drifts, it is observable and resettable.
+
+10. Validation & Metrics
+
+Success is measured by:
+
+behavioural consistency over time,
+
+reduction in contradiction rate,
+
+stability of identity descriptors,
+
+user trust and satisfaction,
+
+curator disagreement frequency.
+
+These metrics are model-agnostic.
+
+11. What This Is Not
+
+Not a chatbot memory hack
+
+Not continuous fine-tuning
+
+Not a black-box RAG wrapper
+
+Not dependent on any single chain or model
+
+12. Why This Matters
+
+Mymory turns memory from:
+
+an accidental side-effect
+into
+a governed, aligned, inspectable system
+
+This is the missing primitive for:
+
+long-lived agents,
+
+AI companions,
+
+institutional AI,
+
+decentralised intelligence economies.
+
+Conclusion
+
+Memory is the alignment surface.
+Who controls memory controls behaviour.
+
+Mymory provides a way to:
+
+preserve identity,
+
+prevent drift,
+
+keep humans in control,
+
+and let AI evolve without losing itself.
+
+We are not teaching machines to remember everything.
+
+We are teaching them what is worth remembering.
