@@ -1,7 +1,76 @@
-Mymory: A Semantic Alignment Layer for Persistent, Governed AI Cognition1. Executive SummaryModern Large Language Models (LLMs) are fundamentally stateless, leading to Behavioral Drift and Preference Inversion over long horizons. Current memory solutions—primarily RAG and fine-tuning—suffer from noise accumulation and a lack of transparency. Mymory introduces a decoupled Semantic Alignment Layer that governs memory via a Directed Acyclic Graph (DAG) and a dual-LLM architecture. By treating memory as a curated, portable asset ($.mmr$), Mymory enables identity-consistent AI that remains under human sovereignty.2. The Problem: The Entropy of Agentic Intent2.1 The Drift ProblemLLMs lose coherence because context windows are finite and retrieval systems grow unbounded. Without a "self-concept" anchor, agents:Contradict established positions due to recent semantic noise.Lose personality density, reverting to "average" model weights.Suffer from Recency Dominance, where the last three prompts outweigh a year of established user values.2.2 The RAG Failure ModeNaïve RAG systems retrieve by similarity, not intent. They lack "memory decay" and cannot provide a causal audit trail. Retrieval drift is simply drift in a different form: the model isn't changing, but the "truth" it sees is becoming corrupted.3. High-Level ArchitectureMymory separates execution from governance.3.1 The Dual-Model WorkflowPrimary Agent (The Actor): Executes tasks and flags "Candidate Memory Events."Semantic Curator (The Governor): An asynchronous, constrained model that evaluates candidates against the existing DAG for Identity Consistency and Causal Alignment.The DAG (The Cognitive Map): Stores memories as nodes with explicit lineage, allowing the system to understand why a preference exists.4. Implementation MethodologyTo implement Mymory, we follow a four-stage pipeline: Ingestion, Curation, Integration, and Export.Phase I: Asynchronous Ingestion & Event FlaggingTo minimize latency, the Primary Agent operates in real-time.Signal Detection: The Agent uses a "Memory Trigger" token to flag important interactions (e.g., "User changed their mind about X," or "Key project milestone reached").Event Buffering: These events are sent to a background queue, ensuring the user experience remains fast.Phase II: The Curation Cycle (Governance)The Curator LLM processes the queue against the Mymory Constitution (a fixed system prompt).Entropy Scoring: The Curator calculates the delta between the new event and the current DAG.High-Entropy Triggers: If a new memory contradicts a high-weight node (e.g., the user previously said "I hate Python" but now says "I love Python"), the Curator flags this for Human-in-the-Loop (HITL) review rather than auto-updating.Node Linking: New nodes are assigned "parents" to maintain provenance.Phase III: Controlled Context Assembly (The DAG-to-RAG Bridge)When a prompt is received, Mymory does not just "search"; it assembles.Pruning: The system identifies the relevant branch of the DAG.Weighting: Recent nodes have higher activation, but "Anchor Nodes" (verified by humans) are protected from decay.Injection: A filtered, minimal context block is injected into the Primary Agent’s prompt.Phase IV: Snapshotting (.mmr)The DAG state is periodically serialized into a .mmr file.Schema: JSON-L structure containing Node IDs, Causal Links, Decay Coefficients, and Governance Signatures.Portability: This file can be uploaded to a different LLM (e.g., shifting from GPT-4 to an open-source Llama model) to maintain behavioral continuity.5. Memory Representation: The DAG SchemaA sample node in the Mymory graph:JSON{
-  "node_id": "mem_2025_dec_001",
+This version is formatted specifically for GitHub, utilizing clear headers, visual hierarchies, and syntax-highlighted blocks to ensure it looks professional on a repository front page.
+
+---
+
+# Mymory: A Semantic Alignment Layer for Persistent, Governed AI Cognition 🧠
+
+Mymory is a decoupled **Semantic Alignment Layer** designed to bridge the gap between stateless LLM inference and long-term, governed AI personality. By moving beyond raw RAG (Retrieval-Augmented Generation) and into **Causal Memory Governance**, Mymory allows AI agents to maintain a stable identity and long-term intent without the need for constant fine-tuning.
+
+---
+
+## 🚩 The Problem: Cognitive Entropy
+
+Modern LLMs suffer from **Behavioral Drift**. Because they lack a "self-concept" anchor, they are prone to:
+
+* **Preference Inversion:** Contradicting established user values due to recent semantic noise.
+* **Recency Dominance:** Over-weighting the last three prompts while losing a year of established context.
+* **The RAG Noise Floor:** Retrieval systems that grow unbounded, returning similar but irrelevant "trash" data that dilutes model reasoning.
+
+## 🏗️ Architecture
+
+Mymory separates **Action** from **Governance** through a dual-LLM system:
+
+### 1. Primary Agent (The Actor)
+
+The task-oriented model. It executes prompts and flags **Candidate Memory Events** in real-time. It remains fast and responsive by offloading memory reasoning.
+
+### 2. Semantic Curator (The Governor)
+
+An asynchronous, constrained model that operates under a fixed **Mymory Constitution**. It evaluates new events against the existing memory graph for consistency, redundancy, and "entropy."
+
+### 3. The Memory DAG
+
+Instead of a flat vector list, memory is stored in a **Directed Acyclic Graph (DAG)**. This provides:
+
+* **Causal Lineage:** The system knows *why* it believes a certain fact or preference.
+* **Auditability:** Humans can trace a behavior back to a specific parent node.
+* **Decay without Deletion:** Old nodes lose weight over time unless reinforced by semantic justification.
+
+---
+
+## 🛠️ Implementation Methodology
+
+### Phase I: Asynchronous Ingestion
+
+To eliminate latency, the Primary Agent uses a **Signal Detection** mechanism. When a "memory-worthy" moment occurs, it is buffered into a queue.
+
+* **Latency Impact:** 0ms (Async processing).
+
+### Phase II: Curation & Entropy Triggers
+
+The Curator processes the queue. If a new memory conflicts with a **High-Weight Anchor Node** (e.g., a user’s fundamental belief), the system triggers an **Entropy Flag**.
+
+* **Human-in-the-Loop (HITL):** High-entropy conflicts are sent to the user for validation: *"You previously stated X, but now suggest Y. Should I update my core alignment?"*
+
+### Phase III: Selective Context Assembly
+
+During retrieval, Mymory doesn't just "search" by similarity. It **prunes the DAG** to find the most coherent branch, injecting only the minimal, most relevant identity-set into the prompt.
+
+### Phase IV: Portable Memory Snapshots (`.mmr`)
+
+All curated memory is exportable as an `.mmr` (Mymory) file. This allows for **Agent Migration**—moving your AI's "soul" from one model provider to another without losing context or identity.
+
+---
+
+## 📄 Memory Node Schema
+
+Each node in the Mymory graph is a structured object designed for governance:
+
+```json
+{
+  "node_id": "mymory_2025_001",
   "content": "User prioritizes system modularity over raw performance.",
-  "causal_parents": ["mem_2025_nov_092"], 
+  "causal_parents": ["mymory_2024_098"], 
   "metadata": {
     "entropy_score": 0.12,
     "source_session": "sess_882",
@@ -10,6 +79,33 @@ Mymory: A Semantic Alignment Layer for Persistent, Governed AI Cognition1. Execu
   "decay_logic": {
     "half_life": "180_days",
     "last_reinforced": "2025-12-19"
+  },
+  "governance": {
+    "owner": "user_01",
+    "access_control": "private"
   }
 }
-6. Design Philosophy & Success MetricsMemory is a Choice: If everything is remembered, nothing is prioritized.Sovereignty: The user owns the .mmr file; the model is just a temporary lens.Auditability: Every response can be traced back to the specific DAG nodes that informed it.Success MetricsContradiction Rate: Frequency of the Agent violating "Anchor Nodes."Recovery Speed: Time taken to restore agent personality on a "cold start" using an .mmr snapshot.Curator Accuracy: Agreement rate between Curator-automated decisions and Human-audited samples.7. ConclusionMymory moves AI from stochastic parrots to coherent personas. By formalizing memory as a governed, causal graph rather than a flat database, we provide the infrastructure for truly long-lived, trustworthy digital twins and institutional agents.
+
+```
+
+---
+
+## 🧪 Success Metrics
+
+* **Contradiction Rate:** Reduction in the frequency of AI violating user-defined "Anchor Nodes."
+* **Personality Stability:** Consistent performance on identity-probes over 6+ months.
+* **Migration Fidelity:** The ability to maintain 90%+ behavioral consistency when switching base LLM models using an `.mmr` file.
+
+---
+
+## 🤝 Contributing
+
+Mymory is an open-source primitive for the future of decentralized intelligence. We are currently looking for contributors in:
+
+* Graph database optimization for DAG traversal.
+* Small-model (SLM) fine-tuning for the "Curator" role.
+* Standardization of the `.mmr` file format.
+
+---
+
+**Would you like me to help you create a specific "Quick Start" guide or a "Curator Constitution" to include in this README?**
