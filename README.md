@@ -1,4 +1,4 @@
-# MyMory
+# MyMory THIS WIP IS NOT READY FOR INSTALL YET!
 
 > Open-source semantic knowledge vault.
 > A MyMories + MemPalace + Graphify hybrid.
