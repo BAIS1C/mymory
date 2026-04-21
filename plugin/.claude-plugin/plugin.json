@@ -1,0 +1,95 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/schemas/plugin.json",
+  "name": "mymory",
+  "displayName": "MyMory Knowledge Vault",
+  "version": "0.1.0",
+  "description": "Governed memory vault substrate with wings, corridors, and scheduled hygiene. Installs as Cowork/Claude Code plugin with 8 skills + MCP server.",
+  "author": {
+    "name": "Sean Uddin",
+    "url": "https://github.com/uddin/mymory"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/uddin/mymory",
+  "repository": "https://github.com/uddin/mymory",
+  "keywords": [
+    "memory",
+    "obsidian",
+    "knowledge-graph",
+    "agentic",
+    "offline",
+    "rag-alternative"
+  ],
+  "skills": [
+    {
+      "name": "mymory-check-context",
+      "path": "skills/mymory-check-context/SKILL.md"
+    },
+    {
+      "name": "mymory-brief",
+      "path": "skills/mymory-brief/SKILL.md"
+    },
+    {
+      "name": "mymory-curate",
+      "path": "skills/mymory-curate/SKILL.md"
+    },
+    {
+      "name": "mymory-recall",
+      "path": "skills/mymory-recall/SKILL.md"
+    },
+    {
+      "name": "mymory-remember",
+      "path": "skills/mymory-remember/SKILL.md"
+    },
+    {
+      "name": "mymory-convert",
+      "path": "skills/mymory-convert/SKILL.md"
+    },
+    {
+      "name": "mymory-ingest",
+      "path": "skills/mymory-ingest/SKILL.md"
+    },
+    {
+      "name": "mymory-graphify",
+      "path": "skills/mymory-graphify/SKILL.md"
+    }
+  ],
+  "mcp": {
+    "servers": {
+      "mymory-vault": {
+        "command": "py",
+        "args": ["-3", "-m", "mymory.mcp"],
+        "env": {
+          "MYMORY_VAULT": "${env:MYMORY_VAULT}"
+        }
+      }
+    }
+  },
+  "hooks": {
+    "SessionEnd": {
+      "command": "py",
+      "args": ["-3", "-m", "mymory.scripts.session_ingest", "--auto"],
+      "continueOnError": true
+    }
+  },
+  "configuration": {
+    "vaultPath": {
+      "type": "string",
+      "description": "Absolute path to the Obsidian vault MyMory manages.",
+      "default": ""
+    },
+    "manifestPath": {
+      "type": "string",
+      "description": "Path to kks_manifest.yaml (defaults to <vault>/kks_manifest.yaml).",
+      "default": ""
+    },
+    "hygieneSchedule": {
+      "type": "string",
+      "description": "Daily hygiene time in HH:MM 24h local.",
+      "default": "05:30"
+    }
+  },
+  "compatibility": {
+    "cowork": ">=0.1.0",
+    "claude-code": ">=1.0.0"
+  }
+}

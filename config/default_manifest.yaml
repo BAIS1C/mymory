@@ -1,0 +1,191 @@
+# kks_manifest.yaml
+# MyMory Knowledge Stack manifest.
+# Copy to your vault root and edit. Every section is overridable.
+
+version: "0.1"
+
+vault:
+  root: "./"                          # path relative to this manifest file
+  home: "HOME.md"
+  context: "CONTEXT.md"
+  identity_dir: "_identity"
+  graph_dir: "_graph"
+  kks_dir: "_kks"
+
+# Wings are top-level domains. Each wing is a folder at vault root.
+# Rooms are optional subfolders. If a wing has rooms, declare them here.
+wings:
+  personal:
+    label: "Personal Wing"
+    description: "Personal notes, stub-only for sensitive content"
+    stub_only: true                   # file metadata only, not full bodies
+    rooms: []
+
+  work:
+    label: "Work Wing"
+    description: "Day-job notes, meetings, projects"
+    rooms:
+      - meetings
+      - projects
+      - research
+
+  research:
+    label: "Research Wing"
+    description: "Papers, tech notes, learning material"
+    rooms:
+      - papers
+      - tech
+      - repos
+
+  sessions:
+    label: "Sessions Wing"
+    description: "AI session logs and agentic conversations"
+    rooms: []
+
+# Canonical entities. Corridors (_graph/_entity_{slug}.md) are built for each.
+# Aliases collapse to the canonical name on the next hygiene pass.
+entities:
+  - name: "Obsidian"
+    slug: "obsidian"
+    aliases: ["obsidian.md"]
+  - name: "Graphify"
+    slug: "graphify"
+    aliases: []
+  - name: "Python"
+    slug: "python"
+    aliases: ["py"]
+
+# Entity aliases discovered during hygiene runs (edit after confirmation).
+entity_aliases: []
+
+# Supported source parsers for ingest.
+parsers:
+  enabled:
+    - pdf
+    - docx
+    - pptx
+    - xlsx
+    - html
+    - csv
+    - txt
+    - rtf
+    - md
+    - cowork_jsonl
+    - chatgpt_export
+    - grok_export
+    - claude_code_jsonl
+    - mmr
+
+# Embedding configuration.
+embedding:
+  model: "sentence-transformers/all-MiniLM-L6-v2"
+  dim: 384
+  store: "pickle"                     # pickle | lancedb
+  threshold: 0.35                     # minimum cosine score for returns
+  top_k: 10
+
+# Retrieval tuning.
+retrieval:
+  semantic_weight: 1.0
+  grep_weight: 0.5
+  graph_hop_weight: 0.3
+  default_hops: 1
+  boost_by_current_wing: 0.1
+
+# Hygiene pipeline configuration.
+hygiene:
+  schedule: "05:30"                   # HH:MM, 24h local time
+  enabled: true
+
+  embed:
+    enabled: true
+    batch_size: 32
+
+  corridors:
+    enabled: true
+    min_references: 1
+
+  supersession:
+    enabled: true
+    auto_redirect: false
+
+  dedup:
+    enabled: true
+    hash_algo: "sha256"
+    auto_apply: false
+
+  brief:
+    enabled: true
+    top_k_new: 20
+    top_k_open: 10
+    include_entity_gaps: true
+    include_alias_candidates: true
+
+# Ingest staging.
+ingest:
+  staging_dir: "_staging"
+  require_curate: true                # pass through curate before filing
+  dedup_on_ingest: true
+
+# Graphify integration.
+graphify:
+  enabled: true
+  default_room: "repos"
+  only_summary: false
+  file_stub_notes: false              # NEVER true; preserves no-per-file-stub rule
+
+# Session ingest (SessionEnd hook).
+session_ingest:
+  enabled: true
+  auto_detect_entities: true
+  auto_backlink: true
+  thresholds:
+    min_decisions: 3
+    min_architecture_changes: 1
+
+# File filters.
+ignore_patterns:
+  - ".obsidian/**"
+  - ".embed_cache/**"
+  - "_staging/**"
+  - "*.tmp"
+  - ".DS_Store"
+  - "Thumbs.db"
+
+# Confidence defaults by source.
+confidence_defaults:
+  human: "CANONICAL"
+  claude-cowork: "DERIVED"
+  chatgpt-web: "DERIVED"
+  grok-mobile: "DERIVED"
+  pdf_import: "VERBATIM"
+  docx_import: "VERBATIM"
+
+# Frontmatter schema version. Changing this triggers migration.
+schema:
+  version: "0.1"
+  required_fields:
+    - title
+    - created
+    - wing
+    - source_agent
+    - confidence
+  optional_fields:
+    - project
+    - source_model
+    - tags
+    - entities
+    - referenced
+    - superseded_by
+
+# MCP server configuration.
+mcp:
+  enabled: true
+  transport: "stdio"                  # stdio | tcp
+  bind: "127.0.0.1"
+  port: 7700
+
+# Identity defaults (generic; override with your own _identity/USER.md).
+identity:
+  operator: "Vault Operator"
+  timezone: "UTC"
