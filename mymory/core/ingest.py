@@ -29,6 +29,7 @@ from datetime import datetime
 from typing import Iterable
 
 from mymory.core.converter import CONVERTERS, convert_file
+from mymory.core.filter import IngestFilter
 from mymory.core.ledger import IngestLedger, default_ledger_path
 from mymory.core.note import make_slug, new_note, write_note
 from mymory.core.vault import Vault
@@ -44,7 +45,7 @@ from mymory.parsers.base import ParsedDocument, Parser
 @dataclass
 class IngestItem:
     source_path: str
-    status: str                  # "converted" | "parsed" | "skipped_dedup" | "unhandled" | "error"
+    status: str                  # "converted" | "parsed" | "skipped_dedup" | "skipped_filter" | "unhandled" | "error"
     dest_paths: list[str] = field(default_factory=list)
     parser: str = ""
     source_format: str = ""
@@ -241,6 +242,7 @@ def ingest_directory(
     tags: list[str] | None = None,
     from_list: str | None = None,
     ledger_db: str | None = None,
+    ingest_filter: IngestFilter | None = None,
 ) -> IngestReport:
     """Walk source_dir OR process an explicit path list and ingest into the vault.
 
@@ -261,6 +263,8 @@ def ingest_directory(
                    ignored.
         ledger_db: override path to the SHA256 dedup ledger (default:
                    `<vault>/.embed_cache/ingest_ledger.db`).
+        ingest_filter: optional noise filter; paths it rejects are recorded
+                   with status="skipped_filter" and never hashed/parsed.
     """
     started = datetime.now().isoformat(timespec="seconds")
     root_label = from_list or source_dir or "(unspecified)"
@@ -302,6 +306,14 @@ def ingest_directory(
         for path in _source_iter():
             item = IngestItem(source_path=path, status="unhandled")
             try:
+                if ingest_filter is not None and not ingest_filter.is_empty():
+                    skip, rule = ingest_filter.should_skip(path)
+                    if skip:
+                        item.status = "skipped_filter"
+                        item.message = rule
+                        report.items.append(item)
+                        continue
+
                 sha = _sha256(path)
                 item.sha256 = sha
                 if not force and ledger.is_converted(sha):

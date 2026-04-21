@@ -372,12 +372,23 @@ def ingest(ctx, path, from_list, wing, staging, dry_run, force, extensions, tags
         click.echo("ERROR: supply either PATH or --from-list, not both", err=True)
         sys.exit(2)
 
+    from mymory.core.filter import IngestFilter
     from mymory.core.ingest import ingest_directory
 
     src_label = path or from_list
     click.echo(f"Ingesting: {src_label}")
     click.echo(f"  wing={wing}  mode={'staging' if staging else 'direct'}  "
                f"dry_run={dry_run}  force={force}  ledger={ledger_db or '(default)'}")
+
+    filt = IngestFilter.from_manifest_block(v.manifest.ingest_filter_block())
+    if not filt.is_empty():
+        click.echo(f"  ingest_filter: active "
+                   f"(ext={len(filt.deny_source_extension)}, "
+                   f"fname_re={len(filt.deny_filename_regex)}, "
+                   f"fname_sub={len(filt.deny_filename_substring)}, "
+                   f"path_sub={len(filt.deny_source_path_substring)}, "
+                   f"path_re={len(filt.deny_source_path_regex)}, "
+                   f"vendor={len(filt.deny_vendor_prefixes)})")
 
     report = ingest_directory(
         vault=v,
@@ -390,6 +401,7 @@ def ingest(ctx, path, from_list, wing, staging, dry_run, force, extensions, tags
         tags=list(tags),
         from_list=from_list,
         ledger_db=ledger_db,
+        ingest_filter=filt,
     )
 
     counts = report.counts

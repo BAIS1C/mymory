@@ -95,8 +95,20 @@ def parse_note(path: str, content: str | None = None) -> Note:
     return Note(path=path, frontmatter=fm, body=body)
 
 
-def serialize_note(note: Note) -> str:
-    """Serialize a Note back to a markdown string with frontmatter."""
+def serialize_note(note: Note, sanitise: bool = True) -> str:
+    """Serialize a Note back to a markdown string with frontmatter.
+
+    When `sanitise` is True (default), inline `#` pollution tokens in the
+    body (hex colors, Singapore addresses, bare content hashtags) are wrapped
+    in backticks so Obsidian does not index them as tags. YAML frontmatter
+    tags are untouched.
+    """
+    body = note.body
+    if sanitise:
+        # Local import to avoid circular dependency at module load.
+        from mymory.core.sanitise import sanitise_hashes
+        body = sanitise_hashes(body)
+
     if note.frontmatter:
         fm_str = yaml.safe_dump(
             note.frontmatter,
@@ -104,15 +116,15 @@ def serialize_note(note: Note) -> str:
             allow_unicode=True,
             sort_keys=False,
         ).rstrip()
-        return f"---\n{fm_str}\n---\n{note.body}"
-    return note.body
+        return f"---\n{fm_str}\n---\n{body}"
+    return body
 
 
-def write_note(note: Note) -> None:
+def write_note(note: Note, sanitise: bool = True) -> None:
     """Write note back to disk. Creates parent dirs if needed."""
     os.makedirs(os.path.dirname(note.path), exist_ok=True)
     with open(note.path, "w", encoding="utf-8") as f:
-        f.write(serialize_note(note))
+        f.write(serialize_note(note, sanitise=sanitise))
 
 
 def new_note(

@@ -139,12 +139,61 @@ The `mymory-recall` skill runs both and merges the result set with deduplication
 
 ### Install
 
+MyMory is pre-release (v0.1.0, alpha). There is no PyPI artifact yet; install from source.
+
+**Prerequisites**
+
+- Python 3.10 or newer (tested on 3.10 - 3.13)
+- Roughly 500 MB disk for the sentence-transformers model (downloaded on first `mymory recall` / `mymory curate`)
+- Optional: `ripgrep` on `$PATH` for fast keyword retrieval (falls back to pure-Python `grep` if absent)
+- Optional: a C compiler for `pymupdf` wheels on exotic platforms; standard wheels cover Windows, macOS, and Linux x86_64/arm64
+
+**Editable install from a local clone (recommended while MyMory is pre-release)**
+
 ```bash
-pip install mymory
-# or from source
-git clone https://github.com/<org>/mymory.git
+git clone https://github.com/uddin/mymory.git
 cd mymory
+python -m venv .venv
+# Windows PowerShell:  .venv\Scripts\Activate.ps1
+# macOS / Linux:       source .venv/bin/activate
 pip install -e .
+```
+
+This exposes the `mymory` console script (defined at `[project.scripts]` in `pyproject.toml`) and lets you edit the package in place.
+
+**Ephemeral run without install (useful for contributors)**
+
+```bash
+git clone https://github.com/uddin/mymory.git
+cd mymory
+pip install -r <(python -c "import tomllib,sys; [print(d) for d in tomllib.load(open('pyproject.toml','rb'))['project']['dependencies']]")
+python -m mymory --help
+```
+
+Or set `PYTHONPATH` to the repo root and invoke the module directly: useful if you want to point at a working copy without `pip install -e .`:
+
+```bash
+# Windows PowerShell
+$env:PYTHONPATH = "C:\path\to\mymory"
+python -m mymory --help
+
+# macOS / Linux
+PYTHONPATH=/path/to/mymory python -m mymory --help
+```
+
+**Optional extras**
+
+```bash
+pip install -e ".[mcp]"        # MCP server (vault_query, vault_context, ...)
+pip install -e ".[lancedb]"    # LanceDB index backend (replaces pickle default)
+pip install -e ".[dev]"        # pytest, black, ruff, mypy
+pip install -e ".[all]"        # everything above
+```
+
+**Future: PyPI release**
+
+```bash
+pip install mymory             # NOT YET AVAILABLE — tracked for v0.5 per Roadmap
 ```
 
 ### Initialize a vault

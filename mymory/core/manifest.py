@@ -92,6 +92,10 @@ class Manifest:
     def ignore_patterns(self) -> list[str]:
         return list(self.raw.get("ignore_patterns") or [])
 
+    def ingest_filter_block(self) -> dict[str, Any]:
+        """Raw `ingest_filter:` dict from the manifest. Empty when absent."""
+        return self.raw.get("ingest_filter") or {}
+
     def confidence_default(self, source_agent: str) -> str:
         return (self.raw.get("confidence_defaults") or {}).get(source_agent, "DERIVED")
 

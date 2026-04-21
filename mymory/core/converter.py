@@ -487,6 +487,11 @@ def convert_file(
             dest_path = os.path.join(wing_dir, f"{date_str}_{slug}_{counter}.md")
             counter += 1
 
+    # Sanitise inline `#` tokens so hex colors, addresses, and content
+    # hashtags in source documents don't pollute the Obsidian tag graph.
+    from mymory.core.sanitise import sanitise_hashes
+    content = sanitise_hashes(content)
+
     with open(dest_path, "w", encoding="utf-8") as f:
         f.write(fm)
         f.write(content)
