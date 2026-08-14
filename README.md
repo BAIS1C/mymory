@@ -1,3 +1,5 @@
+
+
 # MyMory THIS WIP IS NOT READY FOR INSTALL YET!
 
 > Open-source semantic knowledge vault.
@@ -187,7 +189,7 @@ PYTHONPATH=/path/to/mymory python -m mymory --help
 pip install -e ".[mcp]"        # MCP server (vault_query, vault_context, ...)
 pip install -e ".[lancedb]"    # LanceDB index backend (replaces pickle default)
 pip install -e ".[dev]"        # pytest, black, ruff, mypy
-pip install -e ".[all]"        # everything above
+pip install -e ".[all]"        # MCP + LanceDB backends
 ```
 
 **Future: PyPI release**
